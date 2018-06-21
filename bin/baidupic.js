@@ -74,8 +74,9 @@ async function baidupic_fectch(keyword, dir, page_type, page){
     }
 
     if(pics.length===0){
-        console.log("没有找到更多图片!");
+        await question("没有找到更多图片! 按任意键结束");
         rl.close();
+        return;
     }else{
         for(let i=0; i<pics.length; i++){
             console.log("开始下载第"+number+"张图片: "+pics[i]);
