@@ -94,7 +94,7 @@ async function baidupic_fectch(keyword, dir, page_type, page){
         }
     }
 
-    process.nextTick(async ()=>{await baidupic_fectch(keyword, dir, page_type, page+10)});
+    process.nextTick(async ()=>{await baidupic_fectch(keyword, dir, page_type, page+20)});
 }
 
 
