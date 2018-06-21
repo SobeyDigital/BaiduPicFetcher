@@ -79,7 +79,7 @@ async function baidupic_fectch(keyword, dir, page_type, page){
         return;
     }else{
         for(let i=0; i<pics.length; i++){
-            console.log("开始下载第"+number+"张图片: "+pics[i]);
+            //console.log("开始下载第"+number+"张图片: "+pics[i]);
             await download(pics[i],dir);
             number++;
         }
@@ -102,7 +102,7 @@ async function baidupic_fectch(keyword, dir, page_type, page){
 async function download(url, dir) {
     //下载图片
     await mkdirs(dir);
-    setTimeout(()=>{
+    await new Promise((rs,rj)=>setTimeout(()=>{
         let localpath = path.join(dir, path.basename(url));
         if(localpath.indexOf('?')>0){
             localpath = localpath.substring(0, localpath.indexOf('?'));
@@ -110,7 +110,11 @@ async function download(url, dir) {
         let stream = fs.createWriteStream(localpath);
         let req = su.get(url);
         req.pipe(stream);
-    },20)
+        req.on("end", ()=>{
+            console.log("第"+number+"张图片: "+url+"下载完成");
+            rs();
+        });
+    },20));
 }
 
 
