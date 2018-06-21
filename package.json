@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "node ./bin/baidupic",
     "build_win": "pkg -t win . --out-path ./build/win",
     "build_mac": "pkg -t macos . --out-path ./build/mac",
     "build_linux": "pkg -t linux . --out-path ./build/linux"
