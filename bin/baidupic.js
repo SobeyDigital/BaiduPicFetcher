@@ -10,6 +10,9 @@ const readline = require('readline');
 const su = require("superagent");
 const fs = require("fs");
 const path = require("path");
+const http = require("http");
+http.globalAgent.maxSockets=10000;
+http.globalAgent.timeout=2000;
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -37,6 +40,7 @@ let number = 1;
             return;
         }
         keyword = encodeURIComponent(keyword);
+        await mkdirs(dir);
 
         await baidupic_fectch(keyword, dir, page_type, 0);
     }catch(e){
@@ -78,11 +82,12 @@ async function baidupic_fectch(keyword, dir, page_type, page){
         rl.close();
         return;
     }else{
+        let promises = [];
         for(let i=0; i<pics.length; i++){
-            //console.log("开始下载第"+number+"张图片: "+pics[i]);
-            await download(pics[i],dir);
-            number++;
+            let idx = number++;
+            promises.push(download(pics[i],dir, idx));
         }
+        await Promise.all(promises);
     }
 
     if(page_type===2){
@@ -99,21 +104,29 @@ async function baidupic_fectch(keyword, dir, page_type, page){
 
 
 
-async function download(url, dir) {
+function download(url, dir, idx) {
     //下载图片
-    await mkdirs(dir);
-    await new Promise((rs,rj)=>setTimeout(()=>{
-        let localpath = path.join(dir, path.basename(url));
-        if(localpath.indexOf('?')>0){
-            localpath = localpath.substring(0, localpath.indexOf('?'));
-        }
-        let stream = fs.createWriteStream(localpath);
-        let req = su.get(url);
-        req.pipe(stream);
-        req.on("end", ()=>{
-            console.log("第"+number+"张图片: "+url+"下载完成");
+    return new Promise((rs,rj)=>setTimeout(()=>{
+        try{
+            let localpath = path.join(dir, path.basename(url));
+            if(localpath.indexOf('?')>0){
+                localpath = localpath.substring(0, localpath.indexOf('?'));
+            }
+            let stream = fs.createWriteStream(localpath);
+            let req = su.get(url);
+            req.pipe(stream);
+            req.on("error",(err)=>{
+                console.error("第"+idx+"张图片: "+url+"出现错误:"+err);
+                rs();
+            });
+            req.on("end", ()=>{
+                console.log("第"+idx+"张图片: "+url+"下载完成");
+                rs();
+            });
+        }catch(e){
+            console.error("第"+idx+"张图片: "+url+"出现错误:"+e);
             rs();
-        });
+        }
     },20));
 }
 
