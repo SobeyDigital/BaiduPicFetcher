@@ -38,7 +38,7 @@ let number = 1;
         }
         keyword = encodeURIComponent(keyword);
 
-        await baidupic_fectch(keyword, dir, page_type, 10);
+        await baidupic_fectch(keyword, dir, page_type, 0);
     }catch(e){
         console.error(e);
         rl.close();
